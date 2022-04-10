@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Leancoin Airdrop</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+</head>
+
+<body>
+
+    <h2>Leancoin Airdrop</h2>
+    	<h3>Get some free <a href="https://leanco.in" target="_blank">Leancoin tokens</a> on the Polygon Network!</h3>
+    <p>
+    	Please make sure you are using the Polygon mainnet before you hit the button below!
+    	<br><br>
+    	Once you do, you will simply accept two transactions: one free signature to verify you own the address the 100 SIPLEAN tokens are to be airdropped to, and another which will send the transaction to the smart contract in order to dispense the free tokens to you!
+    </p>
+    <br >
+    <button id="runTheDrop">Give Me Free Leancoin!</button>
+    <br /><br />
+
+        <script type="module">
+    import { ethers } from "./ethers.esm.min.js";
+    
+const provider = new ethers.providers.Web3Provider(window.ethereum, 'matic')
+
+const contractAddress = '0xA9b6c2c5DCa260FFE4143BFA4dE89667d6CAe22C';
+
+const abi = [{"inputs":[{"internalType":"contract IERC20","name":"token","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdrawal","type":"event"},{"inputs":[],"name":"destroy","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"setWithdrawalAmount","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawalAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"stateMutability":"payable","type":"receive"}];
+
+const abiContract = new ethers.Contract(contractAddress, abi, provider);
+
+// the magic
+
+async function transaction() {
+  await provider.send("eth_requestAccounts", []);
+  const signer = provider.getSigner();
+  var signature = await signer.signMessage("Welcome to the free Leancoin Airdrop! Signing this simply confirms you control the address your SIPLEAN will be sent to. Please ensure you are on the Polygon Mainnet and hit accept to move onto the next step.");
+  let userAddress = await signer.getAddress();
+  const abiContractWithSigner = abiContract.connect(signer);
+  const tx = await abiContractWithSigner.withdraw();
+  console.log(`Transaction hash: ${tx.hash}`);
+}
+
+document.getElementById('runTheDrop').addEventListener('click', transaction, true);
+        
+    </script>
+
+    <p><i>The smart contract itself is running verified and open source on the Polygon blockchain for anyone to inspect: <a href="https://polygonscan.com/address/0xa9b6c2c5dca260ffe4143bfa4de89667d6cae22c" target="_blank">0xA9b6c2c5DCa260FFE4143BFA4dE89667d6CAe22C</a></i></p>
+</body>
+
+</html>
